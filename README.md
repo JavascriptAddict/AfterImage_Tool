@@ -73,5 +73,10 @@ python test_with_afterimage.py
 ## Result
 ![AfterImage Result](/images/full_view.png?raw=true)
 
+## Contributors
+- [Davis Zheng](https://sg.linkedin.com/in/davis-zhengyang)
+- [Mario Lim](https://sg.linkedin.com/in/mario-lim-it)
+- [Ken Tong](https://www.linkedin.com/in/ken-tong-2b7a8b185/)
+- [Wei Jie Chan](https://sg.linkedin.com/in/chan-wei-jie-11995b141)
 
 

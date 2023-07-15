@@ -68,7 +68,7 @@ $(document).ready(function () {
         proxyDataTable.ajax.reload(); 
         pendingDataTable.ajax.reload(); 
         attackDataTable.ajax.reload(); 
-    }, 10000);
+    }, 3000);
 });
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

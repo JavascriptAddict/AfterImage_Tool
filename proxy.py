@@ -55,10 +55,15 @@ class Proxies:
     
     def getProxy(self):
         '''Return random proxy if status available'''
-        index = randint(0, 12)
-        if self.proxyList[index].connState:
-            return self.proxyList[index]
-        self.getProxy()
+        activeProxy = False
+        chosenIndex = 0
+        while not activeProxy:
+            index = randint(0, len(self.proxyList) - 1)
+            if self.proxyList[index].connState:
+                activeProxy = True
+                chosenIndex = index
+                break 
+        return self.proxyList[chosenIndex]
     
     def updateProxyConn(self, proxy):
         for proxyObject in self.proxyList:

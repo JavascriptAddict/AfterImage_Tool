@@ -20,10 +20,8 @@ class Intercepter:
         self.logger.out("Socket binded to %s" %(self.port))
         self.sock.listen()    
         self.logger.out("Socket is listening")  
-        self.retryCount = 0
         self.respState = False
         self.response = None
-
         while self.state:
             conn, addr = self.sock.accept()    
             self.logger.traffic(str(addr), "AfterImage")
@@ -33,9 +31,9 @@ class Intercepter:
                 continue
             newThread = threading.Thread(target=self.awaitAttackDetails, args=(str(addr), conn, data))            
             newThread.start()
+            newThread.join()
 
     def awaitAttackDetails(self, srcAddr, conn, data):
-        # Need think how specify target IP to proxy server
         newUID = uuid.uuid4().hex
         srcAddr = eval(srcAddr)
         # Src IP, Update State, Target IP
@@ -45,7 +43,6 @@ class Intercepter:
             if element[0]["attack"] is True:
                 ATTACKLOCK.acquire()
                 config.ATTACKS["attacks"].append(element[0])
-                print([d for d in config.ATTACKSAWAIT["attacks"] if d.get('uid') != newUID])
                 config.ATTACKSAWAIT["attacks"] = [d for d in config.ATTACKSAWAIT["attacks"] if d.get('uid') != newUID]
                 ATTACKLOCK.release()
                 break
@@ -53,10 +50,10 @@ class Intercepter:
         conn.sendall(self.response)
         conn.close()
 
-
     def transmit(self, data):
         respState = False
-        while respState is False and self.retryCount < 6:
+        retryCount = 0
+        while respState is False and retryCount < 4:
             try:
                 proxy = config.PROXIES.getProxy()
                 newClient = socket.socket()
@@ -71,15 +68,12 @@ class Intercepter:
             except socket.error as e:
                 self.logger.out("Proxy Connection Fail: {}:{}".format(proxy.ip, proxy.port))
                 config.PROXIES.updateProxyConn(proxy)
-                if self.retryCount < 5:
-                    self.retryCount += 1
-                    self.logger.out("Retrying: Count {}".format(self.retryCount))
+                if retryCount < 3:
+                    retryCount += 1
+                    self.logger.out("Retrying: Count {}".format(retryCount))
                     continue
-                self.response = "Failed to execute attack via after {} times".format(self.retryCount).encode("utf-8")
+                self.response = "Failed to execute attack via after {} times".format(retryCount).encode("utf-8")
                 self.logger.out(self.response)
                 respState  = False
                 break
-        self.retryCount = 0
-
-
-
+        retryCount = 0
